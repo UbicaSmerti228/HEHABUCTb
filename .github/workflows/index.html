@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>НЕНАВИСТЬ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@700&display=swap');
+        
+        body, html {
+            background-color: #ffffff;
+            color: #000000;
+            font-family: 'Oswald', sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            transition: background-color 0.05s, opacity 2s ease-in-out;
+            cursor: crosshair;
+        }
+
+        .pointer-none { pointer-events: none; }
+
+        /* --- УЛУЧШЕННЫЙ ЭФФЕКТ РВАНЫХ ПУЛЬ --- */
+        .bullet-hole {
+            position: fixed;
+            width: 25px;
+            height: 25px;
+            background: #000;
+            pointer-events: none;
+            z-index: 100;
+            transform: translate(-50%, -50%);
+            /* Создает рваный край через маску */
+            clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+            box-shadow: inset 0 0 8px #333;
+        }
+        
+        /* Дополнительные трещины вокруг дырки */
+        .bullet-crack {
+            position: fixed;
+            width: 40px;
+            height: 40px;
+            border: 1px solid rgba(0,0,0,0.15);
+            pointer-events: none;
+            z-index: 99;
+            transform: translate(-50%, -50%);
+            border-radius: 40% 60% 70% 30% / 50% 30% 70% 50%; /* Кривой круг */
+            filter: blur(1px);
+        }
+
+        /* --- СКРИМЕР И СКОБОЧКИ --- */
+        #screamer {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-color: #ff0000;
+            display: none;
+            z-index: 1000;
+            align-items: center; justify-content: center;
+            flex-direction: column;
+            pointer-events: none;
+        }
+        #easter-egg-image {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            object-fit: cover;
+            opacity: 0.4;
+            mix-blend-mode: multiply;
+            filter: grayscale(100%) contrast(150%);
+            display: none;
+            z-index: 1001;
+        }
+        .screamer-msg {
+            font-size: 35vw;
+            color: #000;
+            font-weight: 900;
+            line-height: 0.8;
+            animation: shake-hard 0.04s infinite;
+            position: relative;
+            z-index: 1010;
+        }
+        .laugh-smile {
+            position: absolute;
+            color: #000;
+            font-weight: 900;
+            font-family: 'Arial', sans-serif;
+            pointer-events: none;
+            z-index: 1050;
+            filter: blur(1px);
+            animation: smile-flicker 0.1s infinite;
+        }
+        .smile-drop {
+            position: fixed;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            color: #000;
+            z-index: 1500;
+            pointer-events: none;
+            user-select: none;
+            font-size: 2rem;
+            white-space: nowrap;
+        }
+
+        @keyframes smile-flicker {
+            0% { opacity: 1; transform: scale(1) rotate(5deg); }
+            50% { opacity: 0.7; transform: scale(1.2) rotate(-5deg); }
+            100% { opacity: 1; transform: scale(1.1) rotate(0deg); }
+        }
+
+        @keyframes shake-hard {
+            0% { transform: translate(15px, 15px); filter: invert(0); }
+            50% { transform: translate(-15px, -15px); filter: invert(1); }
+            100% { transform: translate(20px, -10px); }
+        }
+        .screen-shake { animation: s-shake-heavy 0.15s infinite; }
+        @keyframes s-shake-heavy {
+            0% { transform: translate(5px, 3px) rotate(0.5deg); }
+            50% { transform: translate(-5px, -3px) rotate(-0.5deg); }
+            100% { transform: translate(3px, -5px) rotate(0.2deg); }
+        }
+
+        /* --- ВИЗУАЛЬНЫЕ СЛОИ --- */
+        .vignette { position: fixed; top: 0; left: 0; width: 100%; height: 100%; box-shadow: inset 0 0 250px rgba(0,0,0,0.8); z-index: 35; pointer-events: none; }
+        .vhs-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 30; background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.15) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.05), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.05)); background-size: 100% 4px, 4px 100%; }
+        .vhs-lines { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(18, 16, 16, 0); opacity: 0.2; z-index: 31; animation: scanline 4s linear infinite; }
+        @keyframes scanline { 0% { transform: translateY(-100%); } 100% { transform: translateY(100%); } }
+        .burn { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle, transparent 60%, rgba(0,0,0,0.9) 100%); z-index: 36; mix-blend-mode: multiply; opacity: 0; transition: opacity 0.1s; }
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: url('https://grainy-gradients.vercel.app/noise.svg'); opacity: 0.2; z-index: 20; pointer-events: none; }
+
+        /* --- ГЛАВНЫЙ ТЕКСТ (НЕНАВИСТЬ) --- */
+        .main-text {
+            font-size: clamp(5rem, 25vw, 25rem);
+            font-weight: 700;
+            line-height: 0.75;
+            letter-spacing: -0.07em;
+            text-transform: uppercase;
+            transform: scaleX(0.8);
+            text-align: center;
+            user-select: none;
+            z-index: 10;
+            position: relative;
+            filter: blur(0.5px);
+            text-shadow: 15px 15px 0px rgba(0,0,0,0.2);
+            transition: color 0.3s ease;
+        }
+        .main-text::before, .main-text::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            opacity: 0.6; z-index: -1;
+        }
+        .rgb-split .main-text::before {
+            color: #ff0000;
+            transform: translateX(-5px) skewX(2deg);
+            animation: glitch-anim 0.1s infinite;
+        }
+        .rgb-split .main-text::after {
+            color: #0000ff;
+            transform: translateX(5px) skewX(-2deg);
+            animation: glitch-anim-2 0.1s infinite alternate;
+        }
+        @keyframes glitch-anim { 0% { clip-path: inset(10% 0 30% 0); } 50% { clip-path: inset(80% 0 5% 0); } 100% { clip-path: inset(20% 0 50% 0); } }
+        @keyframes glitch-anim-2 { 0% { clip-path: inset(40% 0 10% 0); } 50% { clip-path: inset(5% 0 85% 0); } 100% { clip-path: inset(60% 0 20% 0); } }
+
+        /* --- ИНТЕРФЕЙС --- */
+        .ui-element { position: absolute; font-family: 'Courier New', Courier, monospace; color: inherit; font-weight: bold; text-transform: uppercase; z-index: 40; opacity: 0.8; }
+        .rec { top: 30px; right: 40px; display: flex; align-items: center; gap: 8px; font-size: clamp(1rem, 3vw, 1.8rem); }
+        .rec-text { color: #ff0000; }
+        .dot { width: 14px; height: 14px; background-color: #ff0000; border-radius: 50%; animation: blink 0.5s steps(2) infinite; }
+        .timer { bottom: 30px; left: 40px; font-size: clamp(1rem, 3vw, 1.8rem); cursor: cell; transition: color 0.2s; }
+        .timer:hover { color: #ff0000; }
+        
+        .whisper { position: fixed; font-size: 0.8rem; color: rgba(0,0,0,0.5); font-family: 'Courier New', monospace; z-index: 5; pointer-events: none; text-transform: uppercase; }
+        .glitch-word { position: fixed; font-size: clamp(2rem, 12vw, 10rem); font-weight: 900; color: black; text-transform: uppercase; z-index: 25; pointer-events: none; transform: scaleX(0.8); font-family: 'Oswald', sans-serif; background: white; padding: 0 15px; box-shadow: 10px 10px 0px black; }
+
+        body.inverted { background-color: #000000 !important; color: #ffffff !important; }
+        body.inverted .vhs-overlay, body.inverted .vhs-lines, body.inverted .overlay, body.inverted .vignette, body.inverted .whisper { filter: invert(1); }
+        body.inverted .glitch-word { background: black; color: white; box-shadow: 10px 10px 0px white; }
+        body.inverted .main-text { text-shadow: 15px 15px 0px rgba(255,255,255,0.1); }
+        body.inverted .bullet-hole { background: #fff; }
+        body.inverted .bullet-crack { border-color: rgba(255,255,255,0.2); }
+
+        .distort { filter: hue-rotate(180deg) contrast(300%) brightness(50%) invert(1); }
+    </style>
+</head>
+<body onmousedown="this.classList.add('inverted')" onmouseup="this.classList.remove('inverted')" ontouchstart="this.classList.add('inverted')" ontouchend="this.classList.remove('inverted')">
+    
+    <div id="screamer">
+        <img id="easter-egg-image" src="image_8fe36a.jpg" alt="easter egg">
+        <div class="screamer-msg">НЕТ</div>
+        <div id="laugh-container" style="position:absolute; width:100%; height:100%;"></div>
+    </div>
+
+    <div class="burn" id="burn-effect"></div>
+    <div class="vignette pointer-none"></div>
+    <div class="vhs-overlay pointer-none"></div>
+    <div class="vhs-lines pointer-none"></div>
+    <div class="overlay pointer-none"></div>
+
+    <div class="ui-element rec pointer-none">
+        <div class="dot"></div>
+        <span class="rec-text">REC</span>
+    </div>
+
+    <h1 class="main-text" id="main-title" data-text="НЕНАВИСТЬ">НЕНАВИСТЬ</h1>
+
+    <div class="ui-element timer" id="countdown">00:00:00</div>
+    <div id="glitch-container"></div>
+
+    <script>
+        let timeLeft = 4144; 
+        let isPaused = false;
+        let laughInterval;
+        const words = ["БЕССМЫСЛЕННОСТЬ", "ГНИЕНИЕ", "ТУПИК", "НИЧТО", "УДУШЬЕ", "МРАК", "ПРЕДАТЕЛЬСТВО", "ЗАБВЕНИЕ", "БОЛЬ", "КОНЕЦ", "НЕНАВИСТЬ", "СМЫСЛ?", "ПОЧЕМУ", "ПЕТЛЯ"];
+        const whispers = ["помоги мне", "зачем ты здесь?", "уходи", "все кончено", "ты один", "никому не нужен", "смерть близко", "нажми", "умри", "выход есть?"];
+
+        // УЛУЧШЕННАЯ ЛОГИКА ПУЛЕВЫХ ОТВЕРСТИЙ
+        document.addEventListener('mousedown', function(e) {
+            if (e.target.id === 'countdown') return; 
+            
+            const x = e.clientX;
+            const y = e.clientY;
+
+            // Сама дырка со случайным поворотом и рваным краем
+            const hole = document.createElement('div');
+            hole.className = 'bullet-hole';
+            hole.style.left = x + 'px';
+            hole.style.top = y + 'px';
+            
+            // Генерация уникального рваного края через случайные точки полигона
+            let points = "";
+            for(let i=0; i<12; i++) {
+                let r = 40 + Math.random() * 20;
+                let angle = (i / 12) * Math.PI * 2;
+                let px = 50 + Math.cos(angle) * r;
+                let py = 50 + Math.sin(angle) * r;
+                points += `${px}% ${py}%, `;
+            }
+            hole.style.clipPath = `polygon(${points.slice(0, -2)})`;
+            hole.style.transform = `translate(-50%, -50%) rotate(${Math.random() * 360}deg)`;
+            
+            // Трещины
+            const crack = document.createElement('div');
+            crack.className = 'bullet-crack';
+            crack.style.left = x + 'px';
+            crack.style.top = y + 'px';
+            crack.style.transform = `translate(-50%, -50%) rotate(${Math.random() * 360}deg) scale(${0.8 + Math.random()})`;
+
+            document.body.appendChild(crack);
+            document.body.appendChild(hole);
+
+            setTimeout(() => {
+                hole.style.transition = crack.style.transition = "opacity 1.5s";
+                hole.style.opacity = crack.style.opacity = "0";
+                setTimeout(() => { hole.remove(); crack.remove(); }, 1500);
+            }, 6000);
+        });
+
+        function updateCountdown() {
+            if (isPaused) return;
+            const h = String(Math.floor(timeLeft / 3600)).padStart(2, '0');
+            const m = String(Math.floor((timeLeft % 3600) / 60)).padStart(2, '0');
+            const s = String(timeLeft % 60).padStart(2, '0');
+            document.getElementById('countdown').innerText = `${h}:${m}:${s}`;
+            if (timeLeft > 0) timeLeft--;
+        }
+        setInterval(updateCountdown, 1000);
+
+        function spawnLaugh() {
+            const container = document.getElementById('laugh-container');
+            const smile = document.createElement('div');
+            smile.className = 'laugh-smile';
+            smile.innerText = ")".repeat(Math.floor(Math.random() * 8) + 4);
+            smile.style.fontSize = Math.random() * 15 + 5 + "rem";
+            smile.style.left = Math.random() * 90 + "vw";
+            smile.style.top = Math.random() * 90 + "vh";
+            container.appendChild(smile);
+            setTimeout(() => smile.remove(), 100);
+        }
+
+        function spawnSmiles() {
+            for (let i = 0; i < 40; i++) {
+                setTimeout(() => {
+                    const smile = document.createElement('div');
+                    smile.className = 'smile-drop';
+                    smile.innerText = ")".repeat(Math.floor(Math.random() * 10) + 3);
+                    smile.style.left = Math.random() * 100 + "vw";
+                    smile.style.top = Math.random() * 100 + "vh";
+                    document.body.appendChild(smile);
+                    setTimeout(() => smile.remove(), 800);
+                }, i * 20);
+            }
+        }
+
+        document.getElementById('countdown').addEventListener('click', (e) => {
+            e.stopPropagation(); 
+            if (isPaused) return;
+            const title = document.getElementById('main-title');
+            const screamer = document.getElementById('screamer');
+            const eggImg = document.getElementById('easter-egg-image');
+            isPaused = true;
+            title.innerText = "ВЫХОД ЕСТЬ?";
+            title.setAttribute('data-text', "ВЫХОД ЕСТЬ?");
+            title.style.color = "#00ff41"; 
+            
+            setTimeout(() => {
+                screamer.style.display = 'flex';
+                eggImg.style.display = 'block';
+                document.body.classList.add('screen-shake');
+                laughInterval = setInterval(spawnLaugh, 50);
+                setTimeout(() => {
+                    clearInterval(laughInterval);
+                    document.getElementById('laugh-container').innerHTML = '';
+                    screamer.style.display = 'none';
+                    eggImg.style.display = 'none';
+                    document.body.classList.remove('screen-shake');
+                    title.innerText = "НЕНАВИСТЬ";
+                    title.setAttribute('data-text', "НЕНАВИСТЬ");
+                    title.style.color = "";
+                    isPaused = false;
+                    spawnSmiles();
+                }, 1100);
+            }, 2000);
+        });
+
+        function spawnWord() {
+            const container = document.getElementById('glitch-container');
+            const wordEl = document.createElement('div');
+            wordEl.className = 'glitch-word';
+            wordEl.innerText = words[Math.floor(Math.random() * words.length)];
+            wordEl.style.left = (Math.random() * 50 + 10) + 'vw';
+            wordEl.style.top = (Math.random() * 60 + 20) + 'vh';
+            container.appendChild(wordEl);
+            setTimeout(() => wordEl.remove(), 80);
+        }
+
+        function spawnWhisper() {
+            const w = document.createElement('div');
+            w.className = 'whisper';
+            w.innerText = whispers[Math.floor(Math.random() * whispers.length)];
+            w.style.left = Math.random() * 90 + 'vw';
+            w.style.top = Math.random() * 90 + 'vh';
+            document.body.appendChild(w);
+            setTimeout(() => w.remove(), 1000);
+        }
+
+        setInterval(() => {
+            const rnd = Math.random();
+            if (isPaused) return;
+            if (rnd > 0.85) spawnWord();
+            if (rnd > 0.92) spawnWhisper();
+            if (rnd > 0.90) { document.body.classList.add('rgb-split'); setTimeout(() => document.body.classList.remove('rgb-split'), 100); }
+            if (rnd > 0.96) { const burn = document.getElementById('burn-effect'); burn.style.opacity = '1'; setTimeout(() => burn.style.opacity = '0', 200); }
+            if (rnd > 0.98) { document.body.classList.add('distort'); setTimeout(() => document.body.classList.remove('distort'), 60); }
+            if (rnd > 0.99) { document.body.style.opacity = "0.1"; setTimeout(() => document.body.style.opacity = "1", 300); }
+        }, 120);
+
+        setInterval(() => {
+            const title = document.getElementById('main-title');
+            const offX = (Math.random()-0.5)*10;
+            const offY = (Math.random()-0.5)*10;
+            title.style.transform = `scaleX(0.8) translate(${offX}px, ${offY}px)`;
+            title.style.textShadow = `${15 + offX}px ${15 + offY}px 0px rgba(0,0,0,0.2)`;
+            if (Math.random() > 0.9) {
+                title.style.letterSpacing = (Math.random() * -0.3 - 0.1) + "em";
+            } else {
+                title.style.letterSpacing = "-0.07em";
+            }
+        }, 50);
+    </script>
+</body>
+</html>
