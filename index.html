@@ -26,7 +26,6 @@
 
         .pointer-none { pointer-events: none; }
 
-        /* --- УЛУЧШЕННЫЙ ЭФФЕКТ РВАНЫХ ПУЛЬ --- */
         .bullet-hole {
             position: fixed;
             width: 25px;
@@ -35,12 +34,10 @@
             pointer-events: none;
             z-index: 100;
             transform: translate(-50%, -50%);
-            /* Создает рваный край через маску */
             clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
             box-shadow: inset 0 0 8px #333;
         }
         
-        /* Дополнительные трещины вокруг дырки */
         .bullet-crack {
             position: fixed;
             width: 40px;
@@ -49,11 +46,71 @@
             pointer-events: none;
             z-index: 99;
             transform: translate(-50%, -50%);
-            border-radius: 40% 60% 70% 30% / 50% 30% 70% 50%; /* Кривой круг */
+            border-radius: 40% 60% 70% 30% / 50% 30% 70% 50%;
             filter: blur(1px);
         }
 
-        /* --- СКРИМЕР И СКОБОЧКИ --- */
+        .blood-splatter {
+            position: fixed;
+            background: #880000;
+            pointer-events: none;
+            z-index: 98;
+            transform: translate(-50%, -50%);
+            opacity: 0.8;
+            filter: blur(2px);
+        }
+
+        .target {
+            position: fixed;
+            width: 60px;
+            height: 60px;
+            border: 4px solid #000;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+            cursor: crosshair;
+            animation: target-appear 0.3s ease-out;
+        }
+        .target::after {
+            content: '';
+            width: 20px;
+            height: 20px;
+            background: #000;
+            border-radius: 50%;
+        }
+        @keyframes target-appear {
+            from { transform: scale(0) rotate(180deg); opacity: 0; }
+            to { transform: scale(1) rotate(0); opacity: 1; }
+        }
+
+        #white-noise {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 5000;
+            display: none;
+            opacity: 1;
+            pointer-events: all;
+            background: #000;
+        }
+        #white-noise::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: url('ВАШЕ_ФОТО.jpg'); 
+            background-size: cover;
+            background-position: center;
+            opacity: 1;
+            animation: noise-wave 0.5s infinite; 
+        }
+
+        @keyframes noise-wave {
+            0% { transform: translateY(0); filter: contrast(100%); }
+            50% { transform: translateY(-5px); filter: contrast(150%) hue-rotate(90deg); }
+            100% { transform: translateY(0); }
+        }
+
         #screamer {
             position: fixed;
             top: 0; left: 0;
@@ -125,7 +182,6 @@
             100% { transform: translate(3px, -5px) rotate(0.2deg); }
         }
 
-        /* --- ВИЗУАЛЬНЫЕ СЛОИ --- */
         .vignette { position: fixed; top: 0; left: 0; width: 100%; height: 100%; box-shadow: inset 0 0 250px rgba(0,0,0,0.8); z-index: 35; pointer-events: none; }
         .vhs-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 30; background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.15) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.05), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.05)); background-size: 100% 4px, 4px 100%; }
         .vhs-lines { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(18, 16, 16, 0); opacity: 0.2; z-index: 31; animation: scanline 4s linear infinite; }
@@ -133,7 +189,6 @@
         .burn { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle, transparent 60%, rgba(0,0,0,0.9) 100%); z-index: 36; mix-blend-mode: multiply; opacity: 0; transition: opacity 0.1s; }
         .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: url('https://grainy-gradients.vercel.app/noise.svg'); opacity: 0.2; z-index: 20; pointer-events: none; }
 
-        /* --- ГЛАВНЫЙ ТЕКСТ (НЕНАВИСТЬ) --- */
         .main-text {
             font-size: clamp(5rem, 25vw, 25rem);
             font-weight: 700;
@@ -143,11 +198,12 @@
             transform: scaleX(0.8);
             text-align: center;
             user-select: none;
-            z-index: 10;
+            z-index: 100;
             position: relative;
             filter: blur(0.5px);
             text-shadow: 15px 15px 0px rgba(0,0,0,0.2);
             transition: color 0.3s ease;
+            pointer-events: auto !important;
         }
         .main-text::before, .main-text::after {
             content: attr(data-text);
@@ -168,9 +224,9 @@
         @keyframes glitch-anim { 0% { clip-path: inset(10% 0 30% 0); } 50% { clip-path: inset(80% 0 5% 0); } 100% { clip-path: inset(20% 0 50% 0); } }
         @keyframes glitch-anim-2 { 0% { clip-path: inset(40% 0 10% 0); } 50% { clip-path: inset(5% 0 85% 0); } 100% { clip-path: inset(60% 0 20% 0); } }
 
-        /* --- ИНТЕРФЕЙС --- */
         .ui-element { position: absolute; font-family: 'Courier New', Courier, monospace; color: inherit; font-weight: bold; text-transform: uppercase; z-index: 40; opacity: 0.8; }
         .rec { top: 30px; right: 40px; display: flex; align-items: center; gap: 8px; font-size: clamp(1rem, 3vw, 1.8rem); }
+        .score-ui { top: 30px; left: 40px; font-size: clamp(1rem, 3vw, 1.8rem); color: #000; }
         .rec-text { color: #ff0000; }
         .dot { width: 14px; height: 14px; background-color: #ff0000; border-radius: 50%; animation: blink 0.5s steps(2) infinite; }
         .timer { bottom: 30px; left: 40px; font-size: clamp(1rem, 3vw, 1.8rem); cursor: cell; transition: color 0.2s; }
@@ -180,17 +236,46 @@
         .glitch-word { position: fixed; font-size: clamp(2rem, 12vw, 10rem); font-weight: 900; color: black; text-transform: uppercase; z-index: 25; pointer-events: none; transform: scaleX(0.8); font-family: 'Oswald', sans-serif; background: white; padding: 0 15px; box-shadow: 10px 10px 0px black; }
 
         body.inverted { background-color: #000000 !important; color: #ffffff !important; }
-        body.inverted .vhs-overlay, body.inverted .vhs-lines, body.inverted .overlay, body.inverted .vignette, body.inverted .whisper { filter: invert(1); }
+        body.inverted .vhs-overlay, body.inverted .vhs-lines, body.inverted .overlay, body.inverted .vignette, body.inverted .whisper, body.inverted .score-ui { filter: invert(1); }
         body.inverted .glitch-word { background: black; color: white; box-shadow: 10px 10px 0px white; }
         body.inverted .main-text { text-shadow: 15px 15px 0px rgba(255,255,255,0.1); }
         body.inverted .bullet-hole { background: #fff; }
         body.inverted .bullet-crack { border-color: rgba(255,255,255,0.2); }
+        body.inverted .target { border-color: #fff; }
+        body.inverted .target::after { background: #fff; }
 
         .distort { filter: hue-rotate(180deg) contrast(300%) brightness(50%) invert(1); }
+
+        /* --- НОВЫЙ СТИЛЬ ФИНАЛЬНОГО ТЕКСТА --- */
+        .final-text-overlay {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 85%;
+            max-width: 1000px;
+            color: #ffffff;
+            text-align: center;
+            z-index: 6000;
+            font-family: 'Courier New', monospace;
+            font-size: clamp(0.9rem, 2vw, 1.5rem);
+            line-height: 1.8;
+            text-transform: uppercase;
+            opacity: 0;
+            transition: opacity 4s ease-in;
+            text-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
+            pointer-events: none;
+        }
+        .show-final-text {
+            opacity: 1;
+        }
     </style>
 </head>
 <body onmousedown="this.classList.add('inverted')" onmouseup="this.classList.remove('inverted')" ontouchstart="this.classList.add('inverted')" ontouchend="this.classList.remove('inverted')">
     
+    <div id="white-noise"></div>
+    <div id="final-message-container" class="final-text-overlay"></div>
+
     <div id="screamer">
         <img id="easter-egg-image" src="image_8fe36a.jpg" alt="easter egg">
         <div class="screamer-msg">НЕТ</div>
@@ -205,8 +290,10 @@
 
     <div class="ui-element rec pointer-none">
         <div class="dot"></div>
-        <span class="rec-text">REC</span>
+        <span class="rec-text">ЗАПИСЬ</span>
     </div>
+
+    <div class="ui-element score-ui" id="score-display">ПОПАДАНИЙ: 00/20</div>
 
     <h1 class="main-text" id="main-title" data-text="НЕНАВИСТЬ">НЕНАВИСТЬ</h1>
 
@@ -216,24 +303,85 @@
     <script>
         let timeLeft = 61818; 
         let isPaused = false;
+        let hits = 0;
+        let maxHits = 20;
+        let isFinalPhase = false;
         let laughInterval;
-        const words = ["БЕССМЫСЛЕННОСТЬ", "ГНИЕНИЕ", "ТУПИК", "НИЧТО", "УДУШЬЕ", "МРАК", "ПРЕДАТЕЛЬСТВО", "ЗАБВЕНИЕ", "БОЛЬ", "КОНЕЦ", "НЕНАВИСТЬ", "СМЫСЛ?", "ПОЧЕМУ", "ПЕТЛЯ"];
+        const words = ["БЕССМЫСЛЕННОСТЬ", "ГНИЕНИЕ", "ТУПИК", "НИЧТО", "УДУШЬЕ", "МРАК", "ПРЕДАТЕЛЬСТВО", "ЗАБВЕНИЕ", "БОЛЬ", "КОНЕЦ", "НЕНАВИСТЬ", "СМЫСЛ?", "ПОЧЕМУ", "ПРЕДАТЕЛЬСТВО"];
         const whispers = ["помоги мне", "зачем ты здесь?", "уходи", "все кончено", "ты один", "никому не нужен", "смерть близко", "нажми", "умри", "выход есть?"];
+        const tips = ["СТРЕЛЯЙ ЕЩЕ", "МАЛО КРОВИ", "НЕ ОСТАНАВЛИВАЙСЯ", "БОЛЬШЕ ПУЛЬ", "НУЖНО БОЛЬШЕ"];
 
-        // УЛУЧШЕННАЯ ЛОГИКА ПУЛЕВЫХ ОТВЕРСТИЙ
         document.addEventListener('mousedown', function(e) {
-            if (e.target.id === 'countdown') return; 
-            
+            if (isPaused || e.target.id === 'countdown') return;
+
+            if (isFinalPhase && (e.target.id === 'main-title' || e.target.closest('#main-title'))) {
+                triggerFinalNoise();
+                return;
+            }
+
             const x = e.clientX;
             const y = e.clientY;
 
-            // Сама дырка со случайным поворотом и рваным краем
+            const target = e.target.closest('.target');
+            
+            if (target) {
+                hits++;
+                document.getElementById('score-display').innerText = `ПОПАДАНИЙ: ${String(hits).padStart(2, '0')}/20`;
+                createBulletHole(x, y, true); 
+                target.remove();
+                
+                if (hits >= maxHits) {
+                    startFinalPhase();
+                } else {
+                    setTimeout(spawnTarget, 400);
+                }
+            } else {
+                createBulletHole(x, y, false);
+                
+                if(!isFinalPhase && Math.random() > 0.8) {
+                    const scoreDisp = document.getElementById('score-display');
+                    const originalText = `ПОПАДАНИЙ: ${String(hits).padStart(2, '0')}/20`;
+                    scoreDisp.innerText = tips[Math.floor(Math.random()*tips.length)];
+                    setTimeout(() => { scoreDisp.innerText = originalText; }, 500);
+                }
+            }
+        });
+
+        function createBulletHole(x, y, isBlood = false) {
+            const container = document.body;
+            
+            if (isBlood) {
+                const splatter = document.createElement('div');
+                splatter.className = 'blood-splatter';
+                const size = 60 + Math.random() * 40;
+                splatter.style.width = size + 'px';
+                splatter.style.height = size + 'px';
+                splatter.style.left = x + 'px';
+                splatter.style.top = y + 'px';
+                
+                let points = "";
+                for(let i=0; i<15; i++) {
+                    let r = 30 + Math.random() * 40;
+                    let angle = (i / 15) * Math.PI * 2;
+                    let px = 50 + Math.cos(angle) * r;
+                    let py = 50 + Math.sin(angle) * r;
+                    points += `${px}% ${py}%, `;
+                }
+                splatter.style.clipPath = `polygon(${points.slice(0, -2)})`;
+                container.appendChild(splatter);
+                setTimeout(() => {
+                    splatter.style.transition = "opacity 1s";
+                    splatter.style.opacity = "0";
+                    setTimeout(() => splatter.remove(), 1000);
+                }, 2000);
+            }
+
             const hole = document.createElement('div');
             hole.className = 'bullet-hole';
             hole.style.left = x + 'px';
             hole.style.top = y + 'px';
+            hole.style.zIndex = "100";
             
-            // Генерация уникального рваного края через случайные точки полигона
             let points = "";
             for(let i=0; i<12; i++) {
                 let r = 40 + Math.random() * 20;
@@ -245,22 +393,84 @@
             hole.style.clipPath = `polygon(${points.slice(0, -2)})`;
             hole.style.transform = `translate(-50%, -50%) rotate(${Math.random() * 360}deg)`;
             
-            // Трещины
             const crack = document.createElement('div');
             crack.className = 'bullet-crack';
             crack.style.left = x + 'px';
             crack.style.top = y + 'px';
+            crack.style.zIndex = "99";
             crack.style.transform = `translate(-50%, -50%) rotate(${Math.random() * 360}deg) scale(${0.8 + Math.random()})`;
 
-            document.body.appendChild(crack);
-            document.body.appendChild(hole);
+            container.appendChild(crack);
+            container.appendChild(hole);
 
             setTimeout(() => {
-                hole.style.transition = crack.style.transition = "opacity 1.5s";
+                hole.style.transition = crack.style.transition = "opacity 1s";
                 hole.style.opacity = crack.style.opacity = "0";
-                setTimeout(() => { hole.remove(); crack.remove(); }, 1500);
-            }, 6000);
-        });
+                setTimeout(() => { hole.remove(); crack.remove(); }, 1000);
+            }, 4000);
+        }
+
+        function spawnTarget() {
+            if (isPaused || isFinalPhase) return;
+            document.querySelectorAll('.target').forEach(t => t.remove());
+
+            const target = document.createElement('div');
+            target.className = 'target';
+            target.style.zIndex = "200"; 
+            
+            let x, y;
+            const side = Math.random() > 0.5;
+            if(side) {
+                x = Math.random() * 20 + (Math.random() > 0.5 ? 5 : 75); 
+                y = Math.random() * 70 + 15;
+            } else {
+                x = Math.random() * 70 + 15;
+                y = Math.random() * 15 + (Math.random() > 0.5 ? 5 : 80); 
+            }
+            
+            target.style.left = x + 'vw';
+            target.style.top = y + 'vh';
+            document.body.appendChild(target);
+        }
+
+        function startFinalPhase() {
+            isFinalPhase = true;
+            const title = document.getElementById('main-title');
+            title.innerText = "ТЫ";
+            title.setAttribute('data-text', "ТЫ");
+            title.style.color = "#ff0000";
+            title.style.cursor = "crosshair";
+            document.getElementById('score-display').innerText = "УБЕЙ СЕБЯ";
+        }
+
+        // ОБНОВЛЕННАЯ ФУНКЦИЯ ФИНАЛА
+        function triggerFinalNoise() {
+            const noise = document.getElementById('white-noise');
+            const container = document.getElementById('final-message-container');
+            
+            noise.style.display = 'block'; 
+            document.body.style.filter = 'grayscale(0)';
+            
+            document.getElementById('main-title').style.display = 'none';
+            document.getElementById('score-display').style.display = 'none';
+            document.getElementById('countdown').style.display = 'none';
+            document.querySelectorAll('.ui-element').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('.bullet-hole, .bullet-crack, .target, .blood-splatter').forEach(el => el.remove());
+
+            container.innerHTML = `
+                ПРИГОВОР ВЫНЕСЕН. ОБЖАЛОВАНИЮ НЕ ПОДЛЕЖИТ.<br><br>
+                ТВОЙ ПОСТУПОК — НЕ СИЛА, А ПОЛНЫЙ КРАХ ДУШИ. ДВАДЦАТЬ ЖИЗНЕЙ СТАНУТ ТВОИМ ВЕЧНЫМ КОНВОЕМ. ТИШИНА, КОТОРУЮ ТЫ СОЗДАЛ, БУДЕТ КРИЧАТЬ В ТВОИХ УШАХ ДО КОНЦА ВРЕМЕН.<br><br>
+                ДЛЯ ТЕБЯ НЕТ НИ ПРОЩЕНИЯ, НИ ЗАБВЕНИЯ. ТЫ БОЛЬШЕ НЕ ПРИНАДЛЕЖИШЬ МИРУ ЖИВЫХ, НО И СМЕРТЬ НЕ СТАНЕТ УБЕЖИЩЕМ.<br><br>
+                СМОТРИ В БЕЗДНУ. ОНА УЖЕ ЗДЕСЬ.<br><br><br>
+                <span style="font-size: 1.2em; color: white; text-shadow: 0 0 10px #fff; font-weight: bold;">КАЖДЫЙ «ЧЕЛОВЕК» ОТВЕТИТ ЗА СВОИ ПОСТУПКИ</span>
+            `;
+
+            setTimeout(() => {
+                container.classList.add('show-final-text');
+            }, 500);
+        }
+
+        setTimeout(spawnTarget, 2000);
 
         function updateCountdown() {
             if (isPaused) return;
@@ -305,6 +515,7 @@
             const screamer = document.getElementById('screamer');
             const eggImg = document.getElementById('easter-egg-image');
             isPaused = true;
+            
             title.innerText = "ВЫХОД ЕСТЬ?";
             title.setAttribute('data-text', "ВЫХОД ЕСТЬ?");
             title.style.color = "#00ff41"; 
@@ -320,9 +531,17 @@
                     screamer.style.display = 'none';
                     eggImg.style.display = 'none';
                     document.body.classList.remove('screen-shake');
-                    title.innerText = "НЕНАВИСТЬ";
-                    title.setAttribute('data-text', "НЕНАВИСТЬ");
-                    title.style.color = "";
+                    
+                    if (isFinalPhase) {
+                        title.innerText = "ТЫ";
+                        title.setAttribute('data-text', "ТЫ");
+                        title.style.color = "#ff0000";
+                    } else {
+                        title.innerText = "НЕНАВИСТЬ";
+                        title.setAttribute('data-text', "НЕНАВИСТЬ");
+                        title.style.color = "";
+                    }
+                    
                     isPaused = false;
                     spawnSmiles();
                 }, 1100);
@@ -373,7 +592,7 @@
                 title.style.letterSpacing = "-0.07em";
             }
         }, 50);
-    </script>
+      </script>
 </body>
 </html>
 
