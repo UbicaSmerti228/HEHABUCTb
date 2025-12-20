@@ -21,8 +21,69 @@
             justify-content: center;
             overflow: hidden;
             transition: background-color 0.05s, opacity 2s ease-in-out;
-            cursor: crosshair;
+            cursor: none; 
         }
+
+        /* --- СУБЛИМИНАЛЬНЫЙ СЛОЙ (25-й кадр) --- */
+        #subliminal-layer {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: url('https://grainy-gradients.vercel.app/noise.svg');
+            background-color: #000;
+            z-index: 9000;
+            display: none; /* Скрыт по умолчанию */
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            mix-blend-mode: hard-light;
+        }
+        .subliminal-text {
+            color: red;
+            font-size: 20vw;
+            font-weight: 900;
+            text-transform: uppercase;
+            transform: scaleY(1.5);
+            text-shadow: 10px 0 0 blue, -10px 0 0 lime;
+            animation: shake-hard 0.1s infinite;
+        }
+
+        /* Кастомный курсор */
+        #custom-cursor {
+            position: fixed;
+            width: 20px; 
+            height: 20px;
+            border: 2px solid #000;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 9999;
+            mix-blend-mode: difference;
+        }
+        #custom-cursor::after {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 4px; height: 4px;
+            background: red;
+            transform: translate(-50%, -50%);
+        }
+
+        /* Фантомные курсоры */
+        .phantom-cursor {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            border: 1px solid rgba(255, 0, 0, 0.5);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 9990;
+            opacity: 0.6;
+            mix-blend-mode: multiply;
+        }
+        .phantom-cursor:nth-child(2) { border-color: rgba(0, 0, 255, 0.5); width: 25px; height: 25px; }
+        .phantom-cursor:nth-child(3) { border-color: rgba(0, 255, 0, 0.5); width: 15px; height: 15px; }
 
         .pointer-none { pointer-events: none; }
 
@@ -70,7 +131,7 @@
             align-items: center;
             justify-content: center;
             z-index: 50;
-            cursor: crosshair;
+            cursor: none;
             animation: target-appear 0.3s ease-out;
         }
         .target::after {
@@ -98,10 +159,10 @@
             content: "";
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: url('ВАШЕ_ФОТО.jpg'); 
+            background: url('https://grainy-gradients.vercel.app/noise.svg'); 
             background-size: cover;
             background-position: center;
-            opacity: 1;
+            opacity: 0.3;
             animation: noise-wave 0.5s infinite; 
         }
 
@@ -202,7 +263,7 @@
             position: relative;
             filter: blur(0.5px);
             text-shadow: 15px 15px 0px rgba(0,0,0,0.2);
-            transition: color 0.3s ease;
+            transition: color 0.3s ease; 
             pointer-events: auto !important;
         }
         .main-text::before, .main-text::after {
@@ -229,7 +290,7 @@
         .score-ui { top: 30px; left: 40px; font-size: clamp(1rem, 3vw, 1.8rem); color: #000; }
         .rec-text { color: #ff0000; }
         .dot { width: 14px; height: 14px; background-color: #ff0000; border-radius: 50%; animation: blink 0.5s steps(2) infinite; }
-        .timer { bottom: 30px; left: 40px; font-size: clamp(1rem, 3vw, 1.8rem); cursor: cell; transition: color 0.2s; }
+        .timer { bottom: 30px; left: 40px; font-size: clamp(1rem, 3vw, 1.8rem); cursor: none; transition: color 0.2s; }
         .timer:hover { color: #ff0000; }
         
         .whisper { position: fixed; font-size: 0.8rem; color: rgba(0,0,0,0.5); font-family: 'Courier New', monospace; z-index: 5; pointer-events: none; text-transform: uppercase; }
@@ -243,10 +304,10 @@
         body.inverted .bullet-crack { border-color: rgba(255,255,255,0.2); }
         body.inverted .target { border-color: #fff; }
         body.inverted .target::after { background: #fff; }
+        body.inverted #custom-cursor { border-color: #fff; }
 
         .distort { filter: hue-rotate(180deg) contrast(300%) brightness(50%) invert(1); }
 
-        /* --- НОВЫЙ СТИЛЬ ФИНАЛЬНОГО ТЕКСТА --- */
         .final-text-overlay {
             position: fixed;
             top: 50%;
@@ -262,17 +323,32 @@
             line-height: 1.8;
             text-transform: uppercase;
             opacity: 0;
-            transition: opacity 4s ease-in;
+            transition: opacity 1s ease-in;
             text-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
             pointer-events: none;
         }
         .show-final-text {
             opacity: 1;
         }
+        .typing-cursor::after {
+            content: '█';
+            animation: blink-cursor 0.5s infinite;
+            margin-left: 2px;
+        }
+        @keyframes blink-cursor { 0% { opacity: 0; } 50% { opacity: 1; } 100% { opacity: 0; } }
     </style>
 </head>
 <body onmousedown="this.classList.add('inverted')" onmouseup="this.classList.remove('inverted')" ontouchstart="this.classList.add('inverted')" ontouchend="this.classList.remove('inverted')">
     
+    <div id="subliminal-layer">
+        <div class="subliminal-text">ЗАЧЕМ?</div>
+    </div>
+
+    <div id="custom-cursor"></div>
+    <div class="phantom-cursor" id="p-cursor-1"></div>
+    <div class="phantom-cursor" id="p-cursor-2"></div>
+    <div class="phantom-cursor" id="p-cursor-3"></div>
+
     <div id="white-noise"></div>
     <div id="final-message-container" class="final-text-overlay"></div>
 
@@ -307,11 +383,185 @@
         let maxHits = 20;
         let isFinalPhase = false;
         let laughInterval;
+        
+        // Фантомные курсоры
+        let mouseX = window.innerWidth / 2;
+        let mouseY = window.innerHeight / 2;
+        let cursorX = mouseX, cursorY = mouseY;
+        let p1x = mouseX, p1y = mouseY;
+        let p2x = mouseX, p2y = mouseY;
+        let p3x = mouseX, p3y = mouseY;
+        let evasionX = 0;
+        let evasionY = 0;
+
+        // Аудио контекст
+        let audioCtx;
+        let noiseNode; // Для белого шума
+        let noiseGain;
+
         const words = ["БЕССМЫСЛЕННОСТЬ", "ГНИЕНИЕ", "ТУПИК", "НИЧТО", "УДУШЬЕ", "МРАК", "ПРЕДАТЕЛЬСТВО", "ЗАБВЕНИЕ", "БОЛЬ", "КОНЕЦ", "НЕНАВИСТЬ", "СМЫСЛ?", "ПОЧЕМУ", "ПРЕДАТЕЛЬСТВО"];
         const whispers = ["помоги мне", "зачем ты здесь?", "уходи", "все кончено", "ты один", "никому не нужен", "смерть близко", "нажми", "умри", "выход есть?"];
         const tips = ["СТРЕЛЯЙ ЕЩЕ", "МАЛО КРОВИ", "НЕ ОСТАНАВЛИВАЙСЯ", "БОЛЬШЕ ПУЛЬ", "НУЖНО БОЛЬШЕ"];
+        const consoleLogs = [
+            "SYSTEM FAILURE: Emotional dampeners offline.",
+            "WARNING: Subject heart rate exceeding safe limits.",
+            "CRITICAL: Reality anchor detached.",
+            "LOG: Who is watching you?",
+            "ERROR: Soul not found.",
+            "SYSTEM: Initiating purge sequence..."
+        ];
+
+        // --- ДИНАМИЧЕСКИЙ ЗАГОЛОВОК (Idea 4) ---
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                document.title = "ПОЧЕМУ";
+            } else {
+                document.title = isFinalPhase ? "ТЫ" : "НЕНАВИСТЬ";
+            }
+        });
+
+        // --- СУБЛИМИНАЛЬНЫЙ КАДР (Idea 2) ---
+        function triggerSubliminalFrame() {
+            if(isPaused) return;
+            const layer = document.getElementById('subliminal-layer');
+            layer.style.display = 'flex';
+            
+            // Короткий звук глитча
+            playGlitchSound(); 
+
+            // Скрываем очень быстро (3-4 кадра при 60fps)
+            setTimeout(() => {
+                layer.style.display = 'none';
+            }, 60);
+
+            // Следующий триггер через случайное время (от 15 до 40 секунд)
+            const nextTime = Math.random() * 25000 + 15000; 
+            setTimeout(triggerSubliminalFrame, nextTime);
+        }
+        // Запуск цикла сублиминальных кадров через 10 секунд после старта
+        setTimeout(triggerSubliminalFrame, 10000);
+
+        // --- АУДИО СИСТЕМА (Монотонный белый шум) ---
+        function initAudio() {
+            if (audioCtx) return;
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            audioCtx = new AudioContext();
+
+            // Создание буфера белого шума
+            const bufferSize = audioCtx.sampleRate * 2; // 2 секунды буфера
+            const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+            const data = buffer.getChannelData(0);
+
+            for (let i = 0; i < bufferSize; i++) {
+                data[i] = Math.random() * 2 - 1; // Заполняем случайными значениями
+            }
+
+            noiseNode = audioCtx.createBufferSource();
+            noiseNode.buffer = buffer;
+            noiseNode.loop = true;
+
+            // Фильтр для смягчения шума (чтобы не резал уши высокими частотами)
+            const filter = audioCtx.createBiquadFilter();
+            filter.type = 'lowpass';
+            filter.frequency.value = 1000;
+
+            noiseGain = audioCtx.createGain();
+            noiseGain.gain.value = 0.05; // Тихий уровень громкости
+
+            noiseNode.connect(filter);
+            filter.connect(noiseGain);
+            noiseGain.connect(audioCtx.destination);
+            
+            noiseNode.start();
+        }
+
+        function playShotSound() {
+            if (!audioCtx) return;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.frequency.setValueAtTime(100, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+            osc.type = 'square';
+            gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.1);
+        }
+
+        function playGlitchSound(isTyping = false) {
+            if (!audioCtx) return;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            // Для печати звук выше и короче
+            const freq = isTyping ? 800 + Math.random() * 500 : 100 + Math.random() * 200;
+            const duration = isTyping ? 0.05 : 0.1;
+
+            osc.type = Math.random() > 0.5 ? 'sawtooth' : 'square';
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            if (!isTyping) {
+                osc.frequency.linearRampToValueAtTime(freq + 500, audioCtx.currentTime + duration);
+            }
+            
+            gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+            
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + duration);
+        }
+
+        // --- КОНСОЛЬНЫЕ СООБЩЕНИЯ ---
+        function triggerCreepyConsole() {
+            const msg = consoleLogs[Math.floor(Math.random() * consoleLogs.length)];
+            const style = "background: #000; color: #ff0000; font-size: 14px; font-family: monospace; padding: 2px 5px;";
+            console.log(`%c${msg}`, style);
+            if (Math.random() > 0.8) console.clear();
+        }
+        setInterval(triggerCreepyConsole, 5000);
+
+
+        // --- ОБРАБОТЧИКИ МЫШИ И КУРСОРЫ ---
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+        });
+
+        // Анимация фантомных курсоров (Loop)
+        function animateCursors() {
+            // Основной кастомный курсор без задержки
+            const mainCursor = document.getElementById('custom-cursor');
+            mainCursor.style.left = mouseX + 'px';
+            mainCursor.style.top = mouseY + 'px';
+
+            // Фантомы с задержкой (Lerp)
+            p1x += (mouseX - p1x) * 0.15;
+            p1y += (mouseY - p1y) * 0.15;
+            document.getElementById('p-cursor-1').style.left = p1x + 'px';
+            document.getElementById('p-cursor-1').style.top = p1y + 'px';
+
+            p2x += (mouseX - p2x) * 0.1;
+            p2y += (mouseY - p2y) * 0.1;
+            document.getElementById('p-cursor-2').style.left = p2x + 'px';
+            document.getElementById('p-cursor-2').style.top = p2y + 'px';
+
+            p3x += (mouseX - p3x) * 0.05;
+            p3y += (mouseY - p3y) * 0.05;
+            document.getElementById('p-cursor-3').style.left = p3x + 'px';
+            document.getElementById('p-cursor-3').style.top = p3y + 'px';
+
+            requestAnimationFrame(animateCursors);
+        }
+        animateCursors();
+
 
         document.addEventListener('mousedown', function(e) {
+            // Инициализация звука при первом клике (белый шум вместо дрона)
+            initAudio();
+            playShotSound();
+
             if (isPaused || e.target.id === 'countdown') return;
 
             if (isFinalPhase && (e.target.id === 'main-title' || e.target.closest('#main-title'))) {
@@ -437,16 +687,24 @@
             isFinalPhase = true;
             const title = document.getElementById('main-title');
             title.innerText = "ТЫ";
+            document.title = "ТЫ";
             title.setAttribute('data-text', "ТЫ");
             title.style.color = "#ff0000";
-            title.style.cursor = "crosshair";
+            title.style.cursor = "none";
             document.getElementById('score-display').innerText = "УБЕЙ СЕБЯ";
+            
+            // Немного усиливаем шум в финале
+            if (noiseGain) {
+                noiseGain.gain.linearRampToValueAtTime(0.1, audioCtx.currentTime + 5);
+            }
         }
 
-        // ОБНОВЛЕННАЯ ФУНКЦИЯ ФИНАЛА
-        function triggerFinalNoise() {
+        async function triggerFinalNoise() {
             const noise = document.getElementById('white-noise');
             const container = document.getElementById('final-message-container');
+            
+            // Выключаем шум для звенящей тишины перед текстом (или можно оставить)
+            // Но лучше оставить для атмосферы
             
             noise.style.display = 'block'; 
             document.body.style.filter = 'grayscale(0)';
@@ -457,17 +715,61 @@
             document.querySelectorAll('.ui-element').forEach(el => el.style.display = 'none');
             document.querySelectorAll('.bullet-hole, .bullet-crack, .target, .blood-splatter').forEach(el => el.remove());
 
-            container.innerHTML = `
-                ПРИГОВОР ВЫНЕСЕН. ОБЖАЛОВАНИЮ НЕ ПОДЛЕЖИТ.<br><br>
-                ТВОЙ ПОСТУПОК — НЕ СИЛА, А ПОЛНЫЙ КРАХ ДУШИ. ДВАДЦАТЬ ЖИЗНЕЙ СТАНУТ ТВОИМ ВЕЧНЫМ КОНВОЕМ. ТИШИНА, КОТОРУЮ ТЫ СОЗДАЛ, БУДЕТ КРИЧАТЬ В ТВОИХ УШАХ ДО КОНЦА ВРЕМЕН.<br><br>
-                ДЛЯ ТЕБЯ НЕТ НИ ПРОЩЕНИЯ, НИ ЗАБВЕНИЯ. ТЫ БОЛЬШЕ НЕ ПРИНАДЛЕЖИШЬ МИРУ ЖИВЫХ, НО И СМЕРТЬ НЕ СТАНЕТ УБЕЖИЩЕМ.<br><br>
-                СМОТРИ В БЕЗДНУ. ОНА УЖЕ ЗДЕСЬ.<br><br><br>
-                <span style="font-size: 1.2em; color: white; text-shadow: 0 0 10px #fff; font-weight: bold;">КАЖДЫЙ «ЧЕЛОВЕК» ОТВЕТИТ ЗА СВОИ ПОСТУПКИ</span>
-            `;
+            container.innerHTML = "";
+            container.classList.add('show-final-text');
+            container.classList.add('typing-cursor');
 
-            setTimeout(() => {
-                container.classList.add('show-final-text');
-            }, 500);
+            const textSegments = [
+                { text: "ПРИГОВОР ВЫНЕСЕН. ОБЖАЛОВАНИЮ НЕ ПОДЛЕЖИТ.", type: "p" },
+                { text: "<br><br>", type: "html" },
+                { text: "ТВОЙ ПОСТУПОК — НЕ СИЛА, А ПОЛНЫЙ КРАХ ДУШИ. ДВАДЦАТЬ ЖИЗНЕЙ СТАНУТ ТВОИМ ВЕЧНЫМ КОНВОЕМ. ТИШИНА, КОТОРУЮ ТЫ СОЗДАЛ, БУДЕТ КРИЧАТЬ В ТВОИХ УШАХ ДО КОНЦА ВРЕМЕН.", type: "p" },
+                { text: "<br><br>", type: "html" },
+                { text: "ДЛЯ ТЕБЯ НЕТ НИ ПРОЩЕНИЯ, НИ ЗАБВЕНИЯ. ТЫ БОЛЬШЕ НЕ ПРИНАДЛЕЖИШЬ МИРУ ЖИВЫХ, НО И СМЕРТЬ НЕ СТАНЕТ УБЕЖИЩЕМ.", type: "p" },
+                { text: "<br><br>", type: "html" },
+                { text: "СМОТРИ В БЕЗДНУ. ОНА УЖЕ ЗДЕСЬ.", type: "p" },
+                { text: "<br><br><br>", type: "html" },
+                { 
+                    text: "КАЖДЫЙ «ЧЕЛОВЕК» ОТВЕТИТ ЗА СВОИ ПОСТУПКИ", 
+                    type: "span", 
+                    style: "font-size: 1.2em; color: white; text-shadow: 0 0 10px #fff; font-weight: bold;" 
+                }
+            ];
+
+            const triggerKeySound = () => {
+                // Вызов звука глитча/печати
+                playGlitchSound(true);
+
+                const rnd = Math.random();
+                if (rnd > 0.5) {
+                    container.style.transform = `translate(-50%, -50%) translate(${Math.random()*4-2}px, ${Math.random()*4-2}px)`;
+                }
+                if (rnd > 0.8) {
+                    document.body.classList.add('inverted');
+                    setTimeout(() => document.body.classList.remove('inverted'), 30);
+                }
+            };
+
+            for (let segment of textSegments) {
+                if (segment.type === 'html') {
+                    container.innerHTML += segment.text;
+                } else if (segment.type === 'span') {
+                    const span = document.createElement('span');
+                    span.style.cssText = segment.style;
+                    container.appendChild(span);
+                    for (let char of segment.text) {
+                        span.innerHTML += char;
+                        triggerKeySound();
+                        await new Promise(r => setTimeout(r, 60));
+                    }
+                } else {
+                    for (let char of segment.text) {
+                        container.innerHTML += char;
+                        triggerKeySound();
+                        await new Promise(r => setTimeout(r, 50));
+                    }
+                }
+            }
+            container.classList.remove('typing-cursor');
         }
 
         setTimeout(spawnTarget, 2000);
@@ -557,6 +859,7 @@
             wordEl.style.top = (Math.random() * 60 + 20) + 'vh';
             container.appendChild(wordEl);
             setTimeout(() => wordEl.remove(), 80);
+            playGlitchSound(); 
         }
 
         function spawnWhisper() {
@@ -582,10 +885,38 @@
 
         setInterval(() => {
             const title = document.getElementById('main-title');
-            const offX = (Math.random()-0.5)*10;
-            const offY = (Math.random()-0.5)*10;
+            let offX = (Math.random()-0.5)*10;
+            let offY = (Math.random()-0.5)*10;
+
+            if (isFinalPhase) {
+                const rect = title.getBoundingClientRect();
+                const titleCenterX = rect.left + rect.width / 2;
+                const titleCenterY = rect.top + rect.height / 2;
+                
+                const distX = mouseX - titleCenterX;
+                const distY = mouseY - titleCenterY;
+                const dist = Math.sqrt(distX*distX + distY*distY);
+                
+                const repelRadius = 300; 
+                
+                if (dist < repelRadius) {
+                    const angle = Math.atan2(distY, distX);
+                    const force = (repelRadius - dist) * 0.5; 
+                    
+                    evasionX -= Math.cos(angle) * force;
+                    evasionY -= Math.sin(angle) * force;
+                }
+                
+                evasionX *= 0.9;
+                evasionY *= 0.9;
+                
+                offX += evasionX;
+                offY += evasionY;
+            }
+
             title.style.transform = `scaleX(0.8) translate(${offX}px, ${offY}px)`;
             title.style.textShadow = `${15 + offX}px ${15 + offY}px 0px rgba(0,0,0,0.2)`;
+            
             if (Math.random() > 0.9) {
                 title.style.letterSpacing = (Math.random() * -0.3 - 0.1) + "em";
             } else {
@@ -595,4 +926,3 @@
       </script>
 </body>
 </html>
-
